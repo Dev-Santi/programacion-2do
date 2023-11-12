@@ -85,6 +85,31 @@ class Sistema {
       this.experiencias.push(experiencia);
     }
   }
+
+  eliminarExperiencia(experiencia) {
+    let tieneCompras = false;
+
+    for (let i = 0; i < this.compras.length && !tieneCompras; i++) {
+      if (this.compras[i].experiencia.titulo === experiencia.titulo) {
+        tieneCompras = true;
+      }
+    }
+
+    if (tieneCompras) {
+      alert("Error, existen compras que contienen dicha experiencia.");
+    } else {
+      let indexDeExperiencia = this.experiencias.findIndex(function (experienciaActual) {
+        return experienciaActual.titulo === experiencia.titulo;
+      });
+
+      this.experiencias.splice(indexDeExperiencia, 1);
+    }
+  }
+
+  // Gestión de compras
+  agregarCompra(compra) {
+    this.compras.push(compra);
+  }
 }
 
 /* 
@@ -93,9 +118,4 @@ compras o no), una lista con las experiencias más veces compradas (se muestra s
 seleccionada arriba a la izquierda. Los datos completos de la categoría se muestran en el título “Información detallada de
 la categoría” y se presenta una lista con todas las compras realizadas. De cada una se pone nombre, mail, fecha y hora de
 realizada.
-
-Se puede eliminar una categoría solamente si no hay experiencias de ella.
-Se puede eliminar una experiencia solamente si no hay compras de ella
-
-
 */

@@ -5,6 +5,10 @@ let sistema = new Sistema();
 window.addEventListener("load", programa);
 
 function programa() {
+  /* --- Testeo --- */
+  crearCategorias(3);
+  crearExperiencias(4);
+
   /* Categorias */
   let btnAgregarCategoria = document.getElementById("idBotonAgregarCategoria");
   btnAgregarCategoria.addEventListener("click", crearCategoria);
@@ -15,6 +19,16 @@ function programa() {
   /* Experiencias */
   let btnAgregarExperiencia = document.getElementById("idBotonAltaExperiencia");
   btnAgregarExperiencia.addEventListener("click", agregarExperiencia);
+
+  let btnEliminarExperiencia = document.getElementById("idBotonBajaExperiencia");
+  btnEliminarExperiencia.addEventListener("click", eliminarExperiencia);
+
+  /* Compras */
+  resetearExperienciaSeleccionada();
+  obtenerExperienciaSeleccionada();
+
+  let btnComprar = document.getElementById("idBotonComprar");
+  btnComprar.addEventListener("click", agregarCompra);
 }
 
 /* Gestionar categorias */
@@ -25,7 +39,6 @@ function crearCategoria() {
     let descripcion = document.getElementById("idDetallesCategoria").value;
 
     let categoria = new Categoria(nombre, descripcion);
-
     sistema.agregarCategoria(categoria);
 
     formulario.reset();
@@ -41,7 +54,6 @@ function eliminarCategoria() {
       return categoriaActual;
     }
   });
-
   sistema.eliminarCategoria(categoria);
   actualizarCombosCategorias();
 }
@@ -83,16 +95,35 @@ function agregarExperiencia() {
     let descripcion = document.getElementById("idDescripcionExperiencia").value;
     let precio = document.getElementById("idPrecioExperiencia").value;
     let cantidadPersonas = document.getElementById("idCantidadPersonasExperiencia").value;
-    let categoria = document.getElementById("idCategoriaExperiencia").value;
+    let nombreCategoria = document.getElementById("idCategoriaExperiencia").value;
+
+    let categoria = sistema.categorias.find(function (categoriaActual) {
+      return categoriaActual.nombre === nombreCategoria;
+    });
 
     let experiencia = new Experiencia(titulo, descripcion, precio, cantidadPersonas, categoria);
-    console.log(experiencia);
-
     sistema.agregarExperiencia(experiencia);
 
     formulario.reset();
+
     actualizarCombosExperiencia();
+    actualizarSeccionExperiencias();
   }
+}
+
+function eliminarExperiencia() {
+  let nombreExperiencia = document.getElementById("idComboBajaExperiencia").value;
+
+  let experiencia = sistema.experiencias.find(function (experienciaActual) {
+    if (experienciaActual.titulo === nombreExperiencia) {
+      return experienciaActual;
+    }
+  });
+
+  sistema.eliminarExperiencia(experiencia);
+
+  actualizarCombosExperiencia();
+  actualizarSeccionExperiencias();
 }
 
 function actualizarCombosExperiencia() {
@@ -112,17 +143,136 @@ function actualizarCombosExperiencia() {
   actualizarBtns();
 }
 
-/* utils */
+function actualizarSeccionExperiencias() {
+  let tabla = document.getElementById("idTabla");
+  tabla.innerHTML = "";
+
+  let tbody = document.createElement("tbody");
+  tabla.appendChild(tbody);
+
+  //Crear una fila si hay experiencias, y crear otra cada dos tarjetas
+  let fila = 1;
+  for (let i = 0; i < sistema.experiencias.length; i = i + 2) {
+    let tr = document.createElement("tr");
+    tr.dataset.row = fila;
+    tbody.appendChild(tr);
+    fila++;
+  }
+
+  //Agregar tarjetas a las filas correspondientes, máximo 2 por fila
+  let filaActual = 0;
+  for (let i = 0; i < sistema.experiencias.length; i++) {
+    let td = document.createElement("td");
+    td.classList.add("experiencia");
+
+    let elementoTitulo = document.createElement("p");
+    let elementoDescripcion = document.createElement("p");
+    let elementoPrecio = document.createElement("p");
+
+    elementoTitulo.textContent = sistema.experiencias[i].titulo;
+    elementoDescripcion.textContent = sistema.experiencias[i].descripcion;
+    elementoDescripcion.classList.add("descripcion");
+    elementoPrecio.textContent = "$" + sistema.experiencias[i].precio;
+
+    let elementoImagen = document.createElement("img");
+    let cantidadDePersonas = sistema.experiencias[i].cantidadPersonas;
+    agregarLaImagen(cantidadDePersonas, elementoImagen);
+
+    td.appendChild(elementoTitulo);
+    td.appendChild(elementoDescripcion);
+    td.appendChild(elementoPrecio);
+    td.appendChild(elementoImagen);
+
+    //Comprueba que cada fila solo tenga 2 tarjetas como máximo
+    if (tbody.children[filaActual].children.length < 2) {
+      tbody.children[filaActual].appendChild(td);
+    } else {
+      filaActual++;
+      tbody.children[filaActual].appendChild(td);
+    }
+  }
+}
+
+function agregarLaImagen(cantidadDePersonas, imagen) {
+  switch (cantidadDePersonas) {
+    case "uno":
+      imagen.src = "img/uno.png";
+      imagen.alt = "Imagen de contorno de una persona";
+      break;
+    case "dos":
+      imagen.src = "img/dos.png";
+      imagen.alt = "Imagen de contorno de dos personas";
+      break;
+    case "varias":
+      imagen.src = "img/muchos.png";
+      imagen.alt = "Imagen de contorno de varias personas";
+      break;
+    default:
+      imagen.src = "";
+      imagen.alt = "Imagen no encontrada";
+      break;
+  }
+}
+
+/* Gestion de Compras */
+function resetearExperienciaSeleccionada() {
+  let textoExperienciaCompra = document.getElementById("idCualExperiencia");
+  textoExperienciaCompra.textContent = "Experiencia: sin datos";
+  document.getElementById("idBotonComprar").disabled = true;
+}
+
+function obtenerExperienciaSeleccionada() {
+  let experiencias = document.getElementsByClassName("experiencia");
+  for (let i = 0; i < experiencias.length; i++) {
+    experiencias[i].addEventListener("click", function () {
+      let textoExperienciaCompra = document.getElementById("idCualExperiencia");
+      textoExperienciaCompra.textContent = "Experiencia: " + experiencias[i].children[0].textContent;
+      document.getElementById("idBotonComprar").disabled = false;
+    });
+  }
+}
+
+function agregarCompra() {
+  let formulario = document.getElementById("idFormCompra");
+  if (formulario.reportValidity()) {
+    let nombreExperiencia = document.getElementById("idCualExperiencia").textContent.slice(13); // .textContent.slice(13) saltea el contenido: "Experiencia: " para acceder directamente al titulo de la experiencia.
+    let comprador = document.getElementById("idNombreComprador").value;
+    let email = document.getElementById("idMail").value;
+
+    let experiencia = sistema.experiencias.find(function (experienciaActual) {
+      return experienciaActual.titulo === nombreExperiencia;
+    });
+
+    let compra = new Compra(experiencia, comprador, email);
+    sistema.agregarCompra(compra);
+
+    formulario.reset();
+    resetearExperienciaSeleccionada();
+
+    alert("Compra realizada con éxito");
+  }
+}
+
+/* Utils */
 
 function actualizarBtns() {
   let btnEliminarCategoria = document.getElementById("idBotonBajaCategoria");
   let btnAgregarExperiencia = document.getElementById("idBotonAltaExperiencia");
+  let btnEliminarExperiencia = document.getElementById("idBotonBajaExperiencia");
 
+  //Actualizar botones de categorias
   if (sistema.categorias.length > 0) {
     btnEliminarCategoria.disabled = false;
     btnAgregarExperiencia.disabled = false;
   } else {
     btnEliminarCategoria.disabled = true;
     btnAgregarExperiencia.disabled = true;
+  }
+
+  //Actualizar botones de experiencias
+  if (sistema.experiencias.length > 0) {
+    btnEliminarExperiencia.disabled = false;
+  } else {
+    btnEliminarExperiencia.disabled = true;
   }
 }

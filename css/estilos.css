@@ -1,4 +1,8 @@
 /* estilos 2do sem 2023 */
+body {
+	font-family: Arial, sans-serif;
+}
+
 header {
 	text-align: center;
 }
@@ -69,8 +73,12 @@ td {
 	word-wrap: break-word;
 }
 
-* {
-	font-family: Arial;
+.experiencia p {
+	margin: 0;
+}
+
+.experiencia .descripcion {
+	font-style: italic;
 }
 
 .banda0 {
