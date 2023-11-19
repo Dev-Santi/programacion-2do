@@ -1,3 +1,5 @@
+// Marianela Vázquez (325335) y Santiago Larrosa (251816)
+
 function crearCategorias(cantidad) {
   for (let i = 0; i < cantidad; i++) {
     let id = Math.floor(Math.random() * 999999);

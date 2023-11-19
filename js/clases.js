@@ -1,4 +1,4 @@
-// Oblig 2do semestre 2023 - Clases
+// Marianela Vázquez (325335) y Santiago Larrosa (251816)
 
 class Categoria {
   constructor(nombre, descripcion) {
@@ -27,7 +27,7 @@ class Compra {
 }
 
 class ExperienciasCompras {
-  constructor(experiencia, cantCompras){
+  constructor(experiencia, cantCompras) {
     this.experiencia = experiencia;
     this.cantCompras = cantCompras;
   }
@@ -122,7 +122,7 @@ class Sistema {
   // Informes
   montoExperienciaMasCara() {
     let max = Number.MIN_SAFE_INTEGER;
-    for (let e of this.experiencias){
+    for (let e of this.experiencias) {
       if (e.precio > max) {
         max = e.precio;
       }
@@ -130,7 +130,7 @@ class Sistema {
     return max;
   }
 
-/*   experienciasMasCompradas() {
+  /*   experienciasMasCompradas() {
     let expMasCompradas = [];
     let cantidadComprasMax= 0;
     for (let e of this.experiencias){
@@ -161,33 +161,30 @@ class Sistema {
   experienciasMasCompradas() {
     let listaExperiencias = [];
     let expMasCompradas = [];
-    for (let e of this.experiencias){
+    for (let e of this.experiencias) {
       let cantidadCompras = 0;
-      for (let c of this.compras) { 
+      for (let c of this.compras) {
         if (e.titulo == c.experiencia.titulo) {
           cantidadCompras++;
         }
       }
-      listaExperiencias.push(new ExperienciasCompras(e, cantidadCompras))
+      listaExperiencias.push(new ExperienciasCompras(e, cantidadCompras));
     }
 
-      let cantidadComprasMax = 0;
-      for(let expCant of listaExperiencias){
-        if(expCant.cantCompras > cantidadComprasMax){
-          cantidadComprasMax = expCant.cantCompras
-        }
+    let cantidadComprasMax = 0;
+    for (let expCant of listaExperiencias) {
+      if (expCant.cantCompras > cantidadComprasMax) {
+        cantidadComprasMax = expCant.cantCompras;
       }
-
-      for(let expCant of listaExperiencias){
-        if(cantidadComprasMax == expCant.cantCompras){
-          expMasCompradas.push(expCant.experiencia);
-        }
-      }
-      return expMasCompradas;
     }
-  
 
-
+    for (let expCant of listaExperiencias) {
+      if (cantidadComprasMax == expCant.cantCompras) {
+        expMasCompradas.push(expCant.experiencia);
+      }
+    }
+    return expMasCompradas;
+  }
 }
 
 /* 

@@ -1,4 +1,4 @@
-// Funciones  - obligatorio 2do semestre 2023
+// Marianela Vázquez (325335) y Santiago Larrosa (251816)
 
 let sistema = new Sistema();
 
@@ -6,6 +6,8 @@ window.addEventListener("load", programa);
 
 function programa() {
   /* --- Testeo --- */
+  //crearCategorias(2);
+  //crearExperiencias(20);
 
   /* Categorias */
   let btnAgregarCategoria = document.getElementById("idBotonAgregarCategoria");
@@ -31,6 +33,12 @@ function programa() {
   /* Combo Categorías */
   let comboCategorias = document.getElementById("idComboCategoriasIzquierda");
   comboCategorias.addEventListener("change", detalleComprasCategoria);
+
+  let comboCantidadPersonas = document.getElementById("idCantidadPersonasCategoria");
+  comboCantidadPersonas.addEventListener("change", actualizarSeccionExperiencias);
+
+  let comboOrdenPrecio = document.getElementById("idOrdenPrecio");
+  comboOrdenPrecio.addEventListener("change", actualizarSeccionExperiencias);
 }
 
 /* Gestionar categorias */
@@ -163,35 +171,51 @@ function actualizarSeccionExperiencias() {
   }
 
   //Agregar tarjetas a las filas correspondientes, máximo 2 por fila
+  let filtros = obtenerFiltrosActualizados();
+
+  let experienciasOrdenadas = sistema.experiencias.toSorted(function (a, b) {
+    if (filtros.ordenPrecio == 1) {
+      return a.precio - b.precio;
+    } else {
+      return b.precio - a.precio;
+    }
+  });
+
   let filaActual = 0;
   for (let i = 0; i < sistema.experiencias.length; i++) {
-    let td = document.createElement("td");
-    td.classList.add("experiencia");
+    let experienciaActual = experienciasOrdenadas[i];
+    if (
+      experienciaActual.categoria.nombre == filtros.categoria &&
+      (filtros.cantidadPersonas == "todos" ? true : filtros.cantidadPersonas == experienciaActual.cantidadPersonas)
+    ) {
+      let td = document.createElement("td");
+      td.classList.add("experiencia");
 
-    let elementoTitulo = document.createElement("p");
-    let elementoDescripcion = document.createElement("p");
-    let elementoPrecio = document.createElement("p");
+      let elementoTitulo = document.createElement("p");
+      let elementoDescripcion = document.createElement("p");
+      let elementoPrecio = document.createElement("p");
 
-    elementoTitulo.textContent = sistema.experiencias[i].titulo;
-    elementoDescripcion.textContent = sistema.experiencias[i].descripcion;
-    elementoDescripcion.classList.add("descripcion");
-    elementoPrecio.textContent = "$" + sistema.experiencias[i].precio;
+      elementoTitulo.textContent = experienciasOrdenadas[i].titulo;
+      elementoDescripcion.textContent = experienciasOrdenadas[i].descripcion;
+      elementoDescripcion.classList.add("descripcion");
+      elementoPrecio.textContent = "$" + experienciasOrdenadas[i].precio;
 
-    let elementoImagen = document.createElement("img");
-    let cantidadDePersonas = sistema.experiencias[i].cantidadPersonas;
-    agregarLaImagen(cantidadDePersonas, elementoImagen);
+      let elementoImagen = document.createElement("img");
+      let cantidadDePersonas = experienciasOrdenadas[i].cantidadPersonas;
+      agregarLaImagen(cantidadDePersonas, elementoImagen);
 
-    td.appendChild(elementoTitulo);
-    td.appendChild(elementoDescripcion);
-    td.appendChild(elementoPrecio);
-    td.appendChild(elementoImagen);
+      td.appendChild(elementoTitulo);
+      td.appendChild(elementoDescripcion);
+      td.appendChild(elementoPrecio);
+      td.appendChild(elementoImagen);
 
-    //Comprueba que cada fila solo tenga 2 tarjetas como máximo
-    if (tbody.children[filaActual].children.length < 2) {
-      tbody.children[filaActual].appendChild(td);
-    } else {
-      filaActual++;
-      tbody.children[filaActual].appendChild(td);
+      //Comprueba que cada fila solo tenga 2 tarjetas como máximo
+      if (tbody.children[filaActual].children.length < 2) {
+        tbody.children[filaActual].appendChild(td);
+      } else {
+        filaActual++;
+        tbody.children[filaActual].appendChild(td);
+      }
     }
   }
 
@@ -224,12 +248,26 @@ function resetearExperienciaSeleccionada() {
   let textoExperienciaCompra = document.getElementById("idCualExperiencia");
   textoExperienciaCompra.textContent = "Experiencia: sin datos";
   document.getElementById("idBotonComprar").disabled = true;
+
+  //Resetear clase de la experiencia seleccionada
+  let experiencias = document.getElementsByClassName("experiencia");
+  for (let i = 0; i < experiencias.length; i++) {
+    experiencias[i].classList.remove("selected");
+  }
 }
 
 function agregarEventoExperienciaSeleccionada() {
   let experiencias = document.getElementsByClassName("experiencia");
+
   for (let i = 0; i < experiencias.length; i++) {
     experiencias[i].addEventListener("click", function () {
+      //Resetear clases selected
+      for (let j = 0; j < experiencias.length; j++) {
+        experiencias[j].classList.remove("selected");
+      }
+      //Agregar clase selected a experiencia clickeada
+      experiencias[i].classList.add("selected");
+
       let textoExperienciaCompra = document.getElementById("idCualExperiencia");
       textoExperienciaCompra.textContent = "Experiencia: " + experiencias[i].children[0].textContent;
       document.getElementById("idBotonComprar").disabled = false;
@@ -250,7 +288,7 @@ function agregarCompra() {
 
     let fecha = new Date();
     let dia = fecha.getDate();
-    let mes = fecha.getMonth();
+    let mes = fecha.getMonth() + 1;
     let anio = fecha.getFullYear();
     let hora = fecha.getHours();
     let fechaHora = dia + " " + mes + " " + anio + " " + hora;
@@ -340,4 +378,13 @@ function detalleComprasCategoria() {
       listaCompras.appendChild(elementoDeLista);
     }
   }
+  actualizarSeccionExperiencias();
+}
+
+function obtenerFiltrosActualizados() {
+  let filtroCategoria = document.getElementById("idComboCategoriasIzquierda").value;
+  let filtroCantidadPersonas = document.getElementById("idCantidadPersonasCategoria").value;
+  let filtroOrdenPrecio = document.getElementById("idOrdenPrecio").value;
+
+  return { categoria: filtroCategoria, cantidadPersonas: filtroCantidadPersonas, ordenPrecio: filtroOrdenPrecio };
 }
