@@ -29,6 +29,11 @@ function programa() {
 
   let btnComprar = document.getElementById("idBotonComprar");
   btnComprar.addEventListener("click", agregarCompra);
+
+  /* Combo Categorías */
+  let comboCategorias = document.getElementById("idComboCategoriasIzquierda");
+  comboCategorias.addEventListener("change", detalleComprasCategoria);
+
 }
 
 /* Gestionar categorias */
@@ -108,6 +113,7 @@ function agregarExperiencia() {
 
     actualizarCombosExperiencia();
     actualizarSeccionExperiencias();
+    mostrarExperienciaMasCara();
   }
 }
 
@@ -243,13 +249,23 @@ function agregarCompra() {
       return experienciaActual.titulo === nombreExperiencia;
     });
 
-    let compra = new Compra(experiencia, comprador, email);
+    let fecha = new Date();
+    let dia = fecha.getDate();
+    let mes = fecha.getMonth();
+    let anio = fecha.getFullYear();
+    let hora = fecha.getHours();
+    let fechaHora = dia + " " + mes + " " + anio + " " + hora;
+
+    let compra = new Compra(experiencia, comprador, email, fechaHora);
     sistema.agregarCompra(compra);
 
     formulario.reset();
     resetearExperienciaSeleccionada();
 
     alert("Compra realizada con éxito");
+    mostrarExpMasCompradas();
+    detalleComprasCategoria();
+
   }
 }
 
@@ -274,5 +290,56 @@ function actualizarBtns() {
     btnEliminarExperiencia.disabled = false;
   } else {
     btnEliminarExperiencia.disabled = true;
+  }
+}
+
+// Informes
+function mostrarExperienciaMasCara (){
+     let textoExperienciaMasCara = document.getElementById("idExperienciaMasCara");
+     if (sistema.experiencias.length > 0) {
+       textoExperienciaMasCara.textContent = sistema.montoExperienciaMasCara();
+      }
+ }
+
+
+function mostrarExpMasCompradas (){
+   if (sistema.compras.length > 0) {
+    let listaExpMasCompradas = sistema.experienciasMasCompradas();
+    let lista = document.getElementById("idExperienciasMasCompradas");
+    lista.innerHTML = "";
+    for (let e of listaExpMasCompradas){
+    let elementoDeLista = document.createElement("li");
+    elementoDeLista.textContent = e.titulo;
+    lista.appendChild(elementoDeLista);
+    }
+   }
+ }
+ 
+ function detalleComprasCategoria(){
+  if (sistema.compras.length > 0){
+    let comboCategorias = document.getElementById("idComboCategoriasIzquierda");
+    let categoriaSeleccionada = comboCategorias.value;
+    let listaCompras = document.getElementById("idListaCompras");
+    listaCompras.innerHTML = "";
+    let tieneCompras = false;
+    let comprasDelSistema = sistema.compras;
+    for (let i=0; !tieneCompras && i < sistema.compras.length; i++){
+      if (comprasDelSistema[i].experiencia.categoria.nombre == categoriaSeleccionada) {
+        tieneCompras = true;
+      }
+    }
+    if (tieneCompras) {
+    for (let c of sistema.compras){
+      if (c.experiencia.categoria.nombre == categoriaSeleccionada){
+        let elementoDeLista = document.createElement("li");
+        elementoDeLista.textContent = "Nombre: " + c.comprador + " Mail: " + c.email + " Fecha y hora de la compra: " + c.fechaHora;
+        listaCompras.appendChild(elementoDeLista);
+      }
+    }
+    } else {
+    let elementoDeLista = document.createElement("li");
+    elementoDeLista.textContent = "Sin datos";
+    listaCompras.appendChild(elementoDeLista);
+    }
   }
 }

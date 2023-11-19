@@ -27,6 +27,7 @@ function crearExperiencias(cantidad) {
 
   actualizarCombosExperiencia();
   actualizarSeccionExperiencias();
+  mostrarExperienciaMasCara();
 }
 
 /* 

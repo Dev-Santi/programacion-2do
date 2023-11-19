@@ -18,10 +18,18 @@ class Experiencia {
 }
 
 class Compra {
-  constructor(experiencia, comprador, email) {
+  constructor(experiencia, comprador, email, fechaHora) {
     this.experiencia = experiencia;
     this.comprador = comprador;
     this.email = email;
+    this.fechaHora = fechaHora;
+  }
+}
+
+class ExperienciasCompras {
+  constructor(experiencia, cantCompras){
+    this.experiencia = experiencia;
+    this.cantCompras = cantCompras;
   }
 }
 
@@ -110,6 +118,76 @@ class Sistema {
   agregarCompra(compra) {
     this.compras.push(compra);
   }
+
+  // Informes
+  montoExperienciaMasCara() {
+    let max = Number.MIN_SAFE_INTEGER;
+    for (let e of this.experiencias){
+      if (e.precio > max) {
+        max = e.precio;
+      }
+    }
+    return max;
+  }
+
+/*   experienciasMasCompradas() {
+    let expMasCompradas = [];
+    let cantidadComprasMax= 0;
+    for (let e of this.experiencias){
+      let cantidadCompras = 0;
+      for (let c of this.compras) { 
+        if (e.titulo == c.experiencia.titulo) {
+          cantidadCompras++;
+        }
+      }
+      if (cantidadCompras > cantidadComprasMax){
+        cantidadComprasMax = cantidadCompras;
+      }
+    }
+    for (let e of this.experiencias){
+      let cantidadCompras = 0;
+      for (let c of this.compras) { 
+        if (e.titulo == c.experiencia.titulo) {
+          cantidadCompras++;
+        }
+      }
+     if (cantidadComprasMax == cantidadCompras) {
+      expMasCompradas.push(e);
+     }
+    }
+    return expMasCompradas;
+  } */
+
+  experienciasMasCompradas() {
+    let listaExperiencias = [];
+    let expMasCompradas = [];
+    for (let e of this.experiencias){
+      let cantidadCompras = 0;
+      for (let c of this.compras) { 
+        if (e.titulo == c.experiencia.titulo) {
+          cantidadCompras++;
+        }
+      }
+      listaExperiencias.push(new ExperienciasCompras(e, cantidadCompras))
+    }
+
+      let cantidadComprasMax = 0;
+      for(let expCant of listaExperiencias){
+        if(expCant.cantCompras > cantidadComprasMax){
+          cantidadComprasMax = expCant.cantCompras
+        }
+      }
+
+      for(let expCant of listaExperiencias){
+        if(cantidadComprasMax == expCant.cantCompras){
+          expMasCompradas.push(expCant.experiencia);
+        }
+      }
+      return expMasCompradas;
+    }
+  
+
+
 }
 
 /* 
