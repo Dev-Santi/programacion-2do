@@ -18,11 +18,12 @@ class Experiencia {
 }
 
 class Compra {
-  constructor(experiencia, comprador, email, fechaHora) {
+  constructor(experiencia, comprador, email, fechaCompleta, horaCompleta) {
     this.experiencia = experiencia;
     this.comprador = comprador;
     this.email = email;
-    this.fechaHora = fechaHora;
+    this.fechaCompleta = fechaCompleta;
+    this.horaCompleta = horaCompleta;
   }
 }
 
@@ -123,40 +124,12 @@ class Sistema {
   montoExperienciaMasCara() {
     let max = Number.MIN_SAFE_INTEGER;
     for (let e of this.experiencias) {
-      if (e.precio > max) {
-        max = e.precio;
+      if (parseInt(e.precio) > max) {
+        max = parseInt(e.precio);
       }
     }
     return max;
   }
-
-  /*   experienciasMasCompradas() {
-    let expMasCompradas = [];
-    let cantidadComprasMax= 0;
-    for (let e of this.experiencias){
-      let cantidadCompras = 0;
-      for (let c of this.compras) { 
-        if (e.titulo == c.experiencia.titulo) {
-          cantidadCompras++;
-        }
-      }
-      if (cantidadCompras > cantidadComprasMax){
-        cantidadComprasMax = cantidadCompras;
-      }
-    }
-    for (let e of this.experiencias){
-      let cantidadCompras = 0;
-      for (let c of this.compras) { 
-        if (e.titulo == c.experiencia.titulo) {
-          cantidadCompras++;
-        }
-      }
-     if (cantidadComprasMax == cantidadCompras) {
-      expMasCompradas.push(e);
-     }
-    }
-    return expMasCompradas;
-  } */
 
   experienciasMasCompradas() {
     let listaExperiencias = [];
@@ -187,10 +160,3 @@ class Sistema {
   }
 }
 
-/* 
-En la parte de Informes se debe mostrar el monto de la experiencia más cara registrada (independientemente de si tuvo
-compras o no), una lista con las experiencias más veces compradas (se muestra su título) y los datos relativos a la categoría
-seleccionada arriba a la izquierda. Los datos completos de la categoría se muestran en el título “Información detallada de
-la categoría” y se presenta una lista con todas las compras realizadas. De cada una se pone nombre, mail, fecha y hora de
-realizada.
-*/

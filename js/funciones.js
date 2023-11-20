@@ -5,9 +5,6 @@ let sistema = new Sistema();
 window.addEventListener("load", programa);
 
 function programa() {
-  /* --- Testeo --- */
-  //crearCategorias(2);
-  //crearExperiencias(20);
 
   /* Categorias */
   let btnAgregarCategoria = document.getElementById("idBotonAgregarCategoria");
@@ -135,6 +132,7 @@ function eliminarExperiencia() {
 
   actualizarCombosExperiencia();
   actualizarSeccionExperiencias();
+  resetearExperienciaSeleccionada();
 }
 
 function actualizarCombosExperiencia() {
@@ -291,9 +289,11 @@ function agregarCompra() {
     let mes = fecha.getMonth() + 1;
     let anio = fecha.getFullYear();
     let hora = fecha.getHours();
-    let fechaHora = dia + " " + mes + " " + anio + " " + hora;
+    let minutos = fecha.getMinutes();
+    let fechaCompleta = dia + "/" + mes + "/" + anio;
+    let horaCompleta = hora + ":" + minutos;
 
-    let compra = new Compra(experiencia, comprador, email, fechaHora);
+    let compra = new Compra(experiencia, comprador, email, fechaCompleta, horaCompleta);
     sistema.agregarCompra(compra);
 
     formulario.reset();
@@ -364,15 +364,19 @@ function detalleComprasCategoria() {
       }
     }
     if (tieneCompras) {
+      let tituloInfoDetallada = document.getElementById("idTituloInfoDetallada");
+      tituloInfoDetallada.textContent = "Información detallada de la categoría " + categoriaSeleccionada;
       for (let c of sistema.compras) {
         if (c.experiencia.categoria.nombre == categoriaSeleccionada) {
           let elementoDeLista = document.createElement("li");
           elementoDeLista.textContent =
-            "Nombre: " + c.comprador + " Mail: " + c.email + " Fecha y hora de la compra: " + c.fechaHora;
+            "Nombre: " + c.comprador + " Mail: " + c.email + " Fecha: " + c.fechaCompleta + " Hora: " + c.horaCompleta;
           listaCompras.appendChild(elementoDeLista);
         }
       }
     } else {
+      let tituloInfoDetallada = document.getElementById("idTituloInfoDetallada");
+      tituloInfoDetallada.textContent = "";
       let elementoDeLista = document.createElement("li");
       elementoDeLista.textContent = "Sin datos";
       listaCompras.appendChild(elementoDeLista);
